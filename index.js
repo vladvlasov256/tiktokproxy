@@ -2,7 +2,7 @@ const http = require('http');
 const scraper = require('tiktok-scraper');
 const httpProxy = require('http-proxy');
 
-const linkRegex = /(https:\/\/)?(www\.)?(vm\.tiktok\.com\/\w+\/?|tiktok\.com\/@\w+\/video\/\d+?.*)/;
+const linkRegex = /(?:https:\/\/)?(?:www\.)?(vm\.tiktok\.com\/\w+\/?|tiktok\.com\/@.+\/video\/\d+?.*)/;
 
 let proxy = httpProxy.createProxyServer({});
 const PORT = process.env.PORT || 80;
