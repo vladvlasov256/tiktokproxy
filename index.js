@@ -5,6 +5,7 @@ const httpProxy = require('http-proxy');
 const linkRegex = /(https:\/\/)?(www\.)?(vm\.tiktok\.com\/\w+\/?|tiktok\.com\/@\w+\/video\/\d+?.*)/;
 
 let proxy = httpProxy.createProxyServer({});
+const PORT = process.env.PORT || 80;
 
 function processRequest(meta, req, res) {
     let videoUrl = "";
@@ -35,7 +36,7 @@ http.createServer(function (req, res) {
     } else {
         responseWithError(res, 400);
     }
-}).listen(80);
+}).listen(PORT);
 
 proxy.on('error', function (err, req, res) {
     console.error("Proxy error", err)
