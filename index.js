@@ -1,11 +1,15 @@
 const http = require('http');
 const scraper = require('tiktok-scraper');
 const httpProxy = require('http-proxy');
+var { tall } = require('tall')
 
 const linkRegex = /(?:https:\/\/)?(?:www\.)?(vm\.tiktok\.com\/\w+\/?|tiktok\.com\/@.+\/video\/\d+?.*)/;
+const mobileLinkRegex = /(?:https:\/\/)?vm\.tiktok\.com\/\w+\/?/;
 
 let proxy = httpProxy.createProxyServer({});
 const PORT = process.env.PORT || 80;
+
+const userAgent = "curl/7.77.0";
 
 function processRequest(meta, req, res) {
     let videoUrl = "";
@@ -24,10 +28,26 @@ function responseWithError(res, code) {
     res.end("Oops");
 }
 
+function getLink(url) {
+    return new Promise(function(resolve, reject) {
+        const mobileMatch = url.match(mobileLinkRegex);
+        if (mobileMatch) {
+            tall(url, { 
+                headers: { 'User-Agent': userAgent }
+            })
+            .then(unshortenedUrl => resolve(unshortenedUrl))
+            .catch(error => reject(error))
+        } else {
+            resolve(url);
+        }
+    })
+}
+
 http.createServer(function (req, res) {
     const match = req.url.match(linkRegex);
     if (match && match.length > 0) {
-        scraper.getVideoMeta(`https://${match[0]}`)
+        getLink(`https://${match[0]}`)
+        .then((url) => scraper.getVideoMeta(url) )
         .then((meta) => { processRequest(meta, req, res) })
         .catch((error) => { 
             console.error("Scrapper error", error.message);

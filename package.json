@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "http-proxy": "^1.18.1",
+    "tall": "^5.0.0",
     "tiktok-scraper": "^1.4.36"
   }
 }
