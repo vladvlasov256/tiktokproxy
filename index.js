@@ -3,8 +3,8 @@ const scraper = require('tiktok-scraper');
 const httpProxy = require('http-proxy');
 var { tall } = require('tall')
 
-const linkRegex = /(?:https:\/\/)?(?:www\.)?(vm\.tiktok\.com\/\w+\/?|tiktok\.com\/@.+\/video\/\d+?.*)/;
-const mobileLinkRegex = /(?:https:\/\/)?vm\.tiktok\.com\/\w+\/?/;
+const linkRegex = /(?:https:\/\/)?(?:www\.)?(\w+\.tiktok\.com\/\w+\/?|tiktok\.com\/@.+\/video\/\d+?.*)/;
+const mobileLinkRegex = /(?:https:\/\/)?\w+\.tiktok\.com\/\w+\/?/;
 
 let proxy = httpProxy.createProxyServer({});
 const PORT = process.env.PORT || 80;
