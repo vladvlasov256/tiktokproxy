@@ -1,7 +1,7 @@
 const http = require('http');
+const https = require('https');
 const scraper = require('tiktok-scraper');
 const httpProxy = require('http-proxy');
-var { tall } = require('tall')
 
 const linkRegex = /(?:https:\/\/)?(?:www\.)?(\w+\.tiktok\.com\/\w+\/?|tiktok\.com\/@.+\/video\/\d+?.*)/;
 const mobileLinkRegex = /(?:https:\/\/)?\w+\.tiktok\.com\/\w+\/?/;
@@ -32,11 +32,13 @@ function getLink(url) {
     return new Promise(function(resolve, reject) {
         const mobileMatch = url.match(mobileLinkRegex);
         if (mobileMatch) {
-            tall(url, { 
-                headers: { 'User-Agent': userAgent }
+            https.get(url, (res) => {
+                if(res.statusCode === 301 || res.statusCode === 302) {
+                    resolve(res.headers.location);
+                } else {
+                    reject(new Error("No redirect data for mobile request"));
+                }
             })
-            .then(unshortenedUrl => resolve(unshortenedUrl))
-            .catch(error => reject(error))
         } else {
             resolve(url);
         }
@@ -50,7 +52,7 @@ http.createServer(function (req, res) {
         .then((url) => scraper.getVideoMeta(url) )
         .then((meta) => { processRequest(meta, req, res) })
         .catch((error) => { 
-            console.error("Scrapper error", error.message);
+            console.error("Error", error.message);
             responseWithError(res, 500); 
         });
     } else {
